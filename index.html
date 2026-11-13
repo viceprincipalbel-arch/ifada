@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>إفادة</title>
+<meta name="theme-color" content="#2c1e06">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="إفادة">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--or:#d4a64a;--txt:#f1ead8;--bord:#6b6a63;--vert:#1f6b4f}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Tajawal,Tahoma,Arial,sans-serif;background:#15130e;color:var(--txt);display:flex;flex-direction:column}
+svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+header{text-align:center;padding:16px 14px 12px;background:linear-gradient(#2c1e06,#1b1407);border-bottom:1px solid #4a3a16}
+.titre{display:flex;align-items:center;justify-content:center;gap:10px}
+h1{font-family:'Aref Ruqaa',serif;font-size:34px;color:#f6e7bf;font-weight:700}
+.logo{width:36px;height:36px;border:1.5px solid var(--or);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f6e7bf;font-size:20px}
+.sub{font-size:13px;font-weight:700;margin-top:6px}
+.school{font-size:11px;color:var(--or);margin-top:3px}
+main{flex:1;overflow-y:auto;width:100%;padding:16px;scrollbar-width:thin;scrollbar-color:#4a3a16 transparent}
+footer{text-align:center;font-size:12px;font-weight:700;padding:12px;border-top:1px solid #4a3a16;background:#1b1407}
+.screen{display:none;max-width:480px;margin:0 auto}
+.screen.on{display:block}
+
+/* code secret */
+.cadenas{width:52px;height:52px;margin:4px auto 12px;border-radius:16px;background:#14503d;display:flex;align-items:center;justify-content:center;font-size:26px}
+h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
+.aide{text-align:center;font-size:13px;margin-top:6px}
+.cases{display:flex;gap:12px;justify-content:center;direction:ltr;margin:18px 0 6px}
+.cases i{width:clamp(38px,7vh,48px);height:clamp(40px,7.6vh,56px);border:1.5px solid var(--bord);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.cases i.plein::after{content:'';width:12px;height:12px;border-radius:50%;background:var(--txt)}
+.pm{text-align:center;min-height:22px;color:#ff9a9a;font-size:14px;margin-top:4px}
+.clavier{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:ltr;max-width:320px;margin:10px auto 0}
+.clavier button{height:clamp(36px,7.4vh,58px);border-radius:16px;border:1.5px solid var(--bord);background:#1c1b17;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.clavier button:active{background:#2a2518}
+
+/* accueil */
+.carte{display:flex;align-items:center;gap:14px;width:100%;padding:22px 18px;border-radius:24px;margin-bottom:16px;text-align:right}
+.c-ecole{border:1px solid #2c3a30;background:linear-gradient(135deg,#1f2d25,#17140d)}
+.c-travail{border:2px dashed #d8d2bf}
+.ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.ic.or{border:1.5px solid #6b5420;color:var(--or)}
+.tx{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.tx b{font-family:'Aref Ruqaa',serif;font-size:27px;line-height:1.2;font-weight:700}
+.tx small{font-size:13px;color:#bdb7a5;line-height:1.6}
+.badge{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--or);color:var(--or);border-radius:20px;padding:2px 10px;font-size:12px}
+.fl{margin-inline-start:auto;font-size:22px}
+.note{text-align:center;font-size:12px;margin-top:20px;font-style:italic}
+.inst{display:none;width:100%;margin-top:18px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:transparent;color:var(--or);font-size:17px;font-weight:800}
+
+/* liste des élèves */
+.retour,.lien{background:none;border:0;display:inline-flex;align-items:center;gap:6px;color:var(--or);font-size:14px;margin-bottom:12px}
+.champ{display:flex;align-items:center;gap:10px;border:2px solid #e8e2d0;border-radius:22px;padding:0 16px;height:58px;background:#1a1812;font-size:20px}
+.champ input{flex:1;min-width:0;background:none;border:0;color:var(--txt);font-family:inherit;font-size:16px;outline:0}
+.barre{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:12px 4px}
+.barre span,.barre button{display:inline-flex;align-items:center;gap:6px}
+.barre button{background:none;border:0;font-size:12px}
+.ligne{display:flex;align-items:center;gap:12px;width:100%;padding:16px 14px;margin-bottom:10px;border:1.5px solid #d8d2bf;border-radius:18px;background:#14120d;font-size:15px;text-align:right}
+.ligne:active{background:#2a2518}
+.num{font-size:12px;font-weight:800;min-width:20px}
+.nom{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.vide{text-align:center;color:#b9a77a;padding:16px;grid-column:1/-1}
+
+/* choix des copies */
+.fiche{display:flex;flex-direction:column;gap:6px;border:1.5px solid var(--or);border-radius:18px;padding:16px;margin-bottom:8px;background:#2a1e0a}
+.fiche small{color:var(--or);font-size:12px}
+.fiche b{font-size:17px}
+.lab{font-size:14px;margin:14px 0 8px}
+.copies{display:flex;gap:10px;margin-bottom:18px;direction:ltr}
+.copies button{flex:1;height:58px;border-radius:16px;border:1.5px solid var(--bord);background:#1c1b17;font-size:22px;font-weight:800}
+.copies button.on{background:var(--vert);border-color:var(--vert);color:#fff}
+.go{width:100%;height:58px;border-radius:18px;border:0;background:var(--vert);color:#fff;font-size:20px;font-weight:800}
+.go:disabled{opacity:.5}
+.msg{display:none;margin-bottom:14px;padding:12px;border-radius:14px;text-align:center;font-size:14px;font-weight:700}
+.msg.ok{display:block;background:#143314;color:#9be59b}
+.msg.err{display:block;background:#4a1010;color:#ff9a9a}
+
+/* PC et tablette : liste sur deux colonnes */
+@media (min-width:900px){
+  #ecole{max-width:860px}
+  #liste{display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #envoi{max-width:480px;margin:0 auto}
+}
+
+/* fenêtre basse (PC, téléphone couché) : tout reste visible sans défiler */
+@media (max-height:700px){
+  header{padding:8px 10px}
+  h1{font-size:26px}
+  .logo{width:28px;height:28px;font-size:16px}
+  .sub{font-size:12px;margin-top:3px}
+  .school{font-size:10px;margin-top:2px}
+  main{padding:10px 16px}
+  .cadenas{display:none}
+  h2{font-size:22px}
+  .aide{font-size:12px;margin-top:2px}
+  .cases{margin:10px 0 2px}
+  .pm{min-height:18px;font-size:13px}
+  .clavier{gap:8px;margin-top:2px}
+  .clavier button{font-size:19px}
+  footer{padding:8px}
+}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6M16 5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3.5 2.5 3.5 5"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-del" viewBox="0 0 24 24"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9l4 6M17 9l-4 6"/></symbol>
+</svg>
+
+<header>
+  <div class="titre">
+    <h1>إفادة</h1>
+    <div class="logo"><svg><use href="#i-cap"/></svg></div>
+  </div>
+  <div class="sub">شهادات العمل، الشهادات المدرسية</div>
+  <div class="school">خاص بمدرسة الزاوي الجيلالي</div>
+</header>
+
+<main>
+  <!-- Écran 1 : code secret -->
+  <div id="pin" class="screen on">
+    <div class="cadenas"><svg><use href="#i-lock"/></svg></div>
+    <h2>الرمز السري</h2>
+    <p class="aide">أدخل رمزًا من أربعة أرقام للمتابعة</p>
+    <div class="cases" id="cases"><i></i><i></i><i></i><i></i></div>
+    <div class="pm" id="pinmsg"></div>
+    <div class="clavier" id="clavier"></div>
+  </div>
+
+  <!-- Écran 2 : accueil -->
+  <div id="home" class="screen">
+    <button class="carte c-ecole" onclick="ouvrirEcole()">
+      <span class="ic"><svg><use href="#i-cap"/></svg></span>
+      <span class="tx"><b>الشهادات المدرسية</b><small>اختر التلميذ وعدد النسخ ثم أرسل الطلب إلى الطابعة</small></span>
+      <span class="fl"><svg><use href="#i-left"/></svg></span>
+    </button>
+    <div class="carte c-travail">
+      <span class="ic or"><svg><use href="#i-bag"/></svg></span>
+      <span class="tx"><b>شهادات العمل</b><span class="badge"><svg><use href="#i-clock"/></svg>قريبًا</span><small>ستكون متاحة في التحديث القادم</small></span>
+    </div>
+    <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
+    <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
+  </div>
+
+  <!-- Écran 3 : certificats scolaires -->
+  <div id="ecole" class="screen">
+    <button class="retour" onclick="montrer('home')"><svg><use href="#i-back"/></svg> رجوع</button>
+    <div class="msg" id="msg"></div>
+
+    <div id="recherche">
+      <label class="champ"><svg><use href="#i-search"/></svg><input type="text" id="q" placeholder="ابحث عن اسم التلميذ..." oninput="filtrer()" autocomplete="off"></label>
+      <div class="barre">
+        <span><svg><use href="#i-users"/></svg><b id="n">0</b> تلميذ</span>
+        <button onclick="rafraichir()"><svg><use href="#i-refresh"/></svg> تحديث القائمة</button>
+      </div>
+      <div id="liste"></div>
+    </div>
+
+    <div id="envoi" style="display:none">
+      <div class="fiche"><small>التلميذ</small><b id="choix"></b></div>
+      <button class="lien" onclick="changer()">تغيير التلميذ</button>
+      <p class="lab">عدد النسخ</p>
+      <div class="copies">
+        <button class="on" onclick="nb(1,this)">1</button>
+        <button onclick="nb(2,this)">2</button>
+        <button onclick="nb(3,this)">3</button>
+        <button onclick="nb(4,this)">4</button>
+      </div>
+      <button class="go" id="btnimp" onclick="imprimer()">طباعة</button>
+    </div>
+  </div>
+</main>
+
+<footer>من تطوير الناظر د. زكرياء</footer>
+
+<script>
+/* Adresse du moteur Google Apps Script */
+var API = 'https://script.google.com/macros/s/AKfycbwdhQmakKqS_m9VC9SO3h7KwynRsCR9HnZu9Vl4e09tLdKRb7sZB_zQzzImGKJjVx88/exec';
+
+var CODE = '', SAISIE = '', ELEVES = [], CHOIX = '', COPIES = 1, OCCUPE = false, DEFERRED = null;
+function $(id){ return document.getElementById(id); }
+
+/* appel du moteur Google : renvoie la valeur "r" de la réponse */
+function appel(params){
+  var q = Object.keys(params).map(function(k){
+    return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+  }).join('&');
+  var ctl = new AbortController();
+  var t = setTimeout(function(){ ctl.abort(); }, 60000);
+  return fetch(API + '?' + q, { signal: ctl.signal })
+    .then(function(r){ clearTimeout(t); if(!r.ok) throw new Error('http'); return r.json(); })
+    .then(function(j){ return j.r; });
+}
+
+function montrer(nom){
+  ['pin','home','ecole'].forEach(function(s){ $(s).classList.toggle('on', s === nom); });
+  document.querySelector('main').scrollTop = 0;
+}
+
+/* ---------- code secret ---------- */
+function construireClavier(){
+  var touches = ['1','2','3','4','5','6','7','8','9','مسح','0','eff'];
+  var c = $('clavier');
+  touches.forEach(function(k){
+    var b = document.createElement('button');
+    b.type = 'button';
+    if(k === 'eff'){ b.innerHTML = '<svg><use href="#i-del"/></svg>'; b.setAttribute('aria-label','حذف'); }
+    else { b.textContent = k; }
+    if(k === 'مسح') b.style.fontSize = '15px';
+    b.onclick = function(){ touche(k); };
+    c.appendChild(b);
+  });
+}
+function majCases(){
+  var is = $('cases').children;
+  for(var i = 0; i < 4; i++) is[i].className = (i < SAISIE.length) ? 'plein' : '';
+}
+function touche(k){
+  if(OCCUPE) return;
+  if(k === 'مسح') SAISIE = '';
+  else if(k === 'eff') SAISIE = SAISIE.slice(0, -1);
+  else if(SAISIE.length < 4) SAISIE += k;
+  $('pinmsg').textContent = '';
+  majCases();
+  if(SAISIE.length === 4) verifier();
+}
+function verifier(){
+  OCCUPE = true;
+  $('pinmsg').style.color = '#d8d2bf';
+  $('pinmsg').textContent = '...جارٍ التحقق';
+  var c = SAISIE;
+  appel({ action: 'liste', code: c })
+    .then(function(liste){
+      OCCUPE = false; SAISIE = ''; majCases();
+      $('pinmsg').style.color = '#ff9a9a';
+      if(!liste){ $('pinmsg').textContent = 'الرمز غير صحيح، أو التطبيق مقفل مؤقتًا'; return; }
+      CODE = c; ELEVES = liste; $('pinmsg').textContent = '';
+      montrer('home');
+    })
+    .catch(function(){
+      OCCUPE = false; SAISIE = ''; majCases();
+      $('pinmsg').style.color = '#ff9a9a';
+      $('pinmsg').textContent = 'تعذّر الاتصال، حاول مرة أخرى';
+    });
+}
+document.addEventListener('keydown', function(e){
+  if(!$('pin').classList.contains('on')) return;
+  if(/^[0-9]$/.test(e.key)) touche(e.key);
+  else if(e.key === 'Backspace') touche('eff');
+});
+
+/* ---------- liste des élèves ---------- */
+function normaliser(s){
+  return s.replace(/[\u064B-\u065F\u0670]/g,'')
+          .replace(/[أإآ]/g,'ا')
+          .replace(/ى/g,'ي')
+          .replace(/ة/g,'ه');
+}
+function ouvrirEcole(){
+  $('msg').className = 'msg';
+  changer();
+  montrer('ecole');
+}
+function filtrer(){
+  var q = normaliser($('q').value.trim());
+  var box = $('liste'); box.innerHTML = '';
+  $('n').textContent = ELEVES.length;
+  var k = 0;
+  for(var i = 0; i < ELEVES.length; i++){
+    if(!q || normaliser(ELEVES[i]).indexOf(q) > -1){
+      k++;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'ligne';
+      var num = document.createElement('span'); num.className = 'num'; num.textContent = (k < 10 ? '0' : '') + k;
+      var nom = document.createElement('span'); nom.className = 'nom'; nom.textContent = ELEVES[i];
+      var fl = document.createElement('span'); fl.innerHTML = '<svg><use href="#i-left"/></svg>';
+      b.appendChild(num); b.appendChild(nom); b.appendChild(fl);
+      b.onclick = (function(x){ return function(){ choisir(x); }; })(ELEVES[i]);
+      box.appendChild(b);
+    }
+  }
+  if(!k){
+    var v = document.createElement('div');
+    v.className = 'vide'; v.textContent = 'لا توجد نتائج';
+    box.appendChild(v);
+  }
+}
+function rafraichir(){
+  appel({ action: 'liste', code: CODE })
+    .then(function(liste){ if(liste){ ELEVES = liste; filtrer(); } })
+    .catch(function(){});
+}
+
+/* ---------- choix et impression ---------- */
+function choisir(nom){
+  CHOIX = nom;
+  $('choix').textContent = nom;
+  $('recherche').style.display = 'none';
+  $('envoi').style.display = 'block';
+  $('msg').className = 'msg';
+  document.querySelector('main').scrollTop = 0;
+}
+function changer(){
+  CHOIX = '';
+  $('q').value = '';
+  $('envoi').style.display = 'none';
+  $('recherche').style.display = 'block';
+  filtrer();
+}
+function nb(n, bouton){
+  COPIES = n;
+  var bs = bouton.parentNode.getElementsByTagName('button');
+  for(var i = 0; i < bs.length; i++) bs[i].classList.remove('on');
+  bouton.classList.add('on');
+}
+function imprimer(){
+  if(!CHOIX) return;
+  var b = $('btnimp');
+  b.disabled = true;
+  $('msg').className = 'msg ok';
+  $('msg').textContent = '...جارٍ الإرسال';
+  appel({ action: 'imprimer', code: CODE, eleve: CHOIX, copies: COPIES })
+    .then(function(r){
+      b.disabled = false;
+      if(r === 'ok'){
+        $('msg').className = 'msg ok';
+        $('msg').textContent = 'تم الإرسال ✓ ستبدأ الطباعة خلال دقيقة تقريبًا';
+        changer();
+        document.querySelector('main').scrollTop = 0;
+      } else {
+        $('msg').className = 'msg err';
+        $('msg').textContent = 'حدث خطأ، لم يتم الإرسال';
+      }
+    })
+    .catch(function(){
+      b.disabled = false;
+      $('msg').className = 'msg err';
+      $('msg').textContent = 'تعذّر الاتصال، حاول مرة أخرى';
+    });
+}
+
+/* ---------- installation de l'application ---------- */
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault(); DEFERRED = e; $('install').style.display = 'block';
+});
+window.addEventListener('appinstalled', function(){ $('install').style.display = 'none'; });
+function installer(){
+  if(!DEFERRED) return;
+  DEFERRED.prompt();
+  DEFERRED.userChoice.then(function(){ DEFERRED = null; $('install').style.display = 'none'; });
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+
+construireClavier();
+</script>
+</body>
+</html>
