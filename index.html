@@ -46,7 +46,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 /* accueil */
 .carte{display:flex;align-items:center;gap:14px;width:100%;padding:22px 18px;border-radius:24px;margin-bottom:16px;text-align:right}
 .c-ecole{border:1px solid #2c3a30;background:linear-gradient(135deg,#1f2d25,#17140d)}
-.c-travail{border:2px dashed #d8d2bf}
+.c-travail{border:1px solid #3d3416;background:linear-gradient(135deg,#2b2310,#17140d)}
 .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
 .ic.or{border:1.5px solid #6b5420;color:var(--or)}
 .tx{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
@@ -54,6 +54,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .tx small{font-size:13px;color:#bdb7a5;line-height:1.6}
 .badge{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--or);color:var(--or);border-radius:20px;padding:2px 10px;font-size:12px}
 .fl{margin-inline-start:auto;font-size:22px}
+.titreliste{font-family:'Aref Ruqaa',serif;font-size:24px;color:#f6e7bf;margin:0 4px 12px}
 .note{text-align:center;font-size:12px;margin-top:20px;font-style:italic}
 .inst{display:none;width:100%;margin-top:18px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:transparent;color:var(--or);font-size:17px;font-weight:800}
 
@@ -147,15 +148,16 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 
   <!-- Écran 2 : accueil -->
   <div id="home" class="screen">
-    <button class="carte c-ecole" onclick="ouvrirEcole()">
+    <button class="carte c-ecole" onclick="ouvrir('eleve')">
       <span class="ic"><svg><use href="#i-cap"/></svg></span>
       <span class="tx"><b>الشهادات المدرسية</b><small>اختر التلميذ وعدد النسخ ثم أرسل الطلب إلى الطابعة</small></span>
       <span class="fl"><svg><use href="#i-left"/></svg></span>
     </button>
-    <div class="carte c-travail">
+    <button class="carte c-travail" onclick="ouvrir('prof')">
       <span class="ic or"><svg><use href="#i-bag"/></svg></span>
-      <span class="tx"><b>شهادات العمل</b><span class="badge"><svg><use href="#i-clock"/></svg>قريبًا</span><small>ستكون متاحة في التحديث القادم</small></span>
-    </div>
+      <span class="tx"><b>شهادات العمل</b><small>اختر الأستاذ(ة) وعدد النسخ ثم أرسل الطلب إلى الطابعة</small></span>
+      <span class="fl"><svg><use href="#i-left"/></svg></span>
+    </button>
     <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
     <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
   </div>
@@ -163,19 +165,20 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
   <!-- Écran 3 : certificats scolaires -->
   <div id="ecole" class="screen">
     <button class="retour" onclick="montrer('home')"><svg><use href="#i-back"/></svg> رجوع</button>
+    <div class="titreliste" id="titreliste"></div>
     <div class="msg" id="msg"></div>
 
     <div id="recherche">
       <label class="champ"><svg><use href="#i-search"/></svg><input type="text" id="q" placeholder="ابحث عن اسم التلميذ..." oninput="filtrer()" autocomplete="off"></label>
       <div class="barre">
-        <span><svg><use href="#i-users"/></svg><b id="n">0</b> تلميذ</span>
+        <span><svg><use href="#i-users"/></svg><b id="n">0</b> <span id="unite">تلميذ</span></span>
         <button onclick="rafraichir()"><svg><use href="#i-refresh"/></svg> تحديث القائمة</button>
       </div>
       <div id="liste"></div>
     </div>
 
     <div id="envoi" style="display:none">
-      <div class="fiche"><small>التلميذ</small><b id="choix"></b></div>
+      <div class="fiche"><small id="lbl">التلميذ</small><b id="choix"></b></div>
       <button class="lien" onclick="changer()">تغيير التلميذ</button>
       <p class="lab">عدد النسخ</p>
       <div class="copies">
@@ -195,7 +198,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 /* Adresse du moteur Google Apps Script */
 var API = 'https://script.google.com/macros/s/AKfycbwdhQmakKqS_m9VC9SO3h7KwynRsCR9HnZu9Vl4e09tLdKRb7sZB_zQzzImGKJjVx88/exec';
 
-var CODE = '', SAISIE = '', ELEVES = [], CHOIX = '', COPIES = 1, OCCUPE = false, DEFERRED = null;
+var CODE = '', SAISIE = '', ELEVES = [], PROFS = [], MODE = 'eleve', CHOIX = '', COPIES = 1, OCCUPE = false, DEFERRED = null;
 function $(id){ return document.getElementById(id); }
 
 /* appel du moteur Google : renvoie la valeur "r" de la réponse */
@@ -274,26 +277,54 @@ function normaliser(s){
           .replace(/ى/g,'ي')
           .replace(/ة/g,'ه');
 }
-function ouvrirEcole(){
+function courante(){ return MODE === 'prof' ? PROFS : ELEVES; }
+
+function ouvrir(mode){
+  MODE = mode;
+  var prof = (mode === 'prof');
   $('msg').className = 'msg';
+  $('titreliste').textContent = prof ? 'شهادات العمل' : 'الشهادات المدرسية';
+  $('q').placeholder = prof ? 'ابحث عن اسم الأستاذ(ة)...' : 'ابحث عن اسم التلميذ...';
+  $('unite').textContent = prof ? 'أستاذ' : 'تلميذ';
+  $('lbl').textContent = prof ? 'الأستاذ(ة)' : 'التلميذ';
   changer();
   montrer('ecole');
+  if(prof && !PROFS.length) chargerProfs();
+}
+
+function messageListe(texte){
+  var box = $('liste'); box.innerHTML = '';
+  var v = document.createElement('div');
+  v.className = 'vide'; v.textContent = texte;
+  box.appendChild(v);
+}
+
+function chargerProfs(){
+  $('n').textContent = '0';
+  messageListe('...جارٍ التحميل');
+  appel({ action: 'liste_profs', code: CODE })
+    .then(function(liste){
+      if(liste){ PROFS = liste; filtrer(); }
+      else { messageListe('تعذّر تحميل القائمة'); }
+    })
+    .catch(function(){ messageListe('تعذّر الاتصال، حاول مرة أخرى'); });
 }
 function filtrer(){
   var q = normaliser($('q').value.trim());
   var box = $('liste'); box.innerHTML = '';
-  $('n').textContent = ELEVES.length;
+  var L = courante();
+  $('n').textContent = L.length;
   var k = 0;
-  for(var i = 0; i < ELEVES.length; i++){
-    if(!q || normaliser(ELEVES[i]).indexOf(q) > -1){
+  for(var i = 0; i < L.length; i++){
+    if(!q || normaliser(L[i]).indexOf(q) > -1){
       k++;
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'ligne';
       var num = document.createElement('span'); num.className = 'num'; num.textContent = (k < 10 ? '0' : '') + k;
-      var nom = document.createElement('span'); nom.className = 'nom'; nom.textContent = ELEVES[i];
+      var nom = document.createElement('span'); nom.className = 'nom'; nom.textContent = L[i];
       var fl = document.createElement('span'); fl.innerHTML = '<svg><use href="#i-left"/></svg>';
       b.appendChild(num); b.appendChild(nom); b.appendChild(fl);
-      b.onclick = (function(x){ return function(){ choisir(x); }; })(ELEVES[i]);
+      b.onclick = (function(x){ return function(){ choisir(x); }; })(L[i]);
       box.appendChild(b);
     }
   }
@@ -304,8 +335,11 @@ function filtrer(){
   }
 }
 function rafraichir(){
-  appel({ action: 'liste', code: CODE })
-    .then(function(liste){ if(liste){ ELEVES = liste; filtrer(); } })
+  var prof = (MODE === 'prof');
+  appel({ action: prof ? 'liste_profs' : 'liste', code: CODE })
+    .then(function(liste){
+      if(liste){ if(prof) PROFS = liste; else ELEVES = liste; filtrer(); }
+    })
     .catch(function(){});
 }
 
@@ -337,7 +371,10 @@ function imprimer(){
   b.disabled = true;
   $('msg').className = 'msg ok';
   $('msg').textContent = '...جارٍ الإرسال';
-  appel({ action: 'imprimer', code: CODE, eleve: CHOIX, copies: COPIES })
+  var demande = (MODE === 'prof')
+    ? { action: 'imprimer_prof', code: CODE, prof: CHOIX, copies: COPIES }
+    : { action: 'imprimer', code: CODE, eleve: CHOIX, copies: COPIES };
+  appel(demande)
     .then(function(r){
       b.disabled = false;
       if(r === 'ok'){
