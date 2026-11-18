@@ -54,6 +54,22 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .tx small{font-size:13px;color:#bdb7a5;line-height:1.6}
 .badge{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--or);color:var(--or);border-radius:20px;padding:2px 10px;font-size:12px}
 .fl{margin-inline-start:auto;font-size:22px}
+.c-listes{border:1px solid #1f3140;background:linear-gradient(135deg,#1a2733,#17140d)}
+.outils{display:flex;gap:10px;margin:0 0 12px}
+.petit{flex:1;height:42px;border-radius:14px;border:1.5px solid var(--bord);background:transparent;font-size:14px;font-weight:700}
+.rangee{display:flex;align-items:center;gap:12px;width:100%;padding:16px 14px;margin-bottom:10px;border:1.5px solid #d8d2bf;border-radius:18px;background:#14120d;font-size:16px;text-align:right}
+.rangee .case{width:26px;height:26px;border-radius:8px;border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;color:transparent}
+.rangee.on{border-color:var(--vert);background:#10231c}
+.rangee.on .case{background:var(--vert);border-color:var(--vert);color:#fff}
+.rangee .nom{flex:1;font-weight:800}
+.rangee .eff{font-size:12px;color:#bdb7a5;font-weight:400}
+.info{border:1px solid #3d3416;background:#1c1709;border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.7}
+.info .i1{color:#bdb7a5}
+.info .i2{font-weight:700;margin-top:4px}
+.info .tg{background:none;border:0;color:var(--or);font-size:13px;padding:4px 0}
+.info .det{margin-top:6px;border-top:1px solid #3d3416;padding-top:6px}
+.info .det div{padding:2px 0}
+.actionbar{position:sticky;bottom:-16px;margin:14px -16px -16px;padding:12px 16px 16px;background:#15130e;border-top:1px solid #4a3a16}
 .titreliste{font-family:'Aref Ruqaa',serif;font-size:24px;color:#f6e7bf;margin:0 4px 12px}
 .note{text-align:center;font-size:12px;margin-top:20px;font-style:italic}
 .inst{display:none;width:100%;margin-top:18px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:transparent;color:var(--or);font-size:17px;font-weight:800}
@@ -87,6 +103,9 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 
 /* PC et tablette : liste sur deux colonnes */
 @media (min-width:900px){
+  #classes{max-width:860px}
+  #listeclasses{display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  .actionbar .copies,.actionbar .go,.actionbar .lab{max-width:480px;margin-left:auto;margin-right:auto}
   #ecole{max-width:860px}
   #liste{display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
   #envoi{max-width:480px;margin:0 auto}
@@ -123,6 +142,8 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-del" viewBox="0 0 24 24"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9l4 6M17 9l-4 6"/></symbol>
 </svg>
 
@@ -158,6 +179,11 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
       <span class="tx"><b>شهادات العمل</b><small>اختر الأستاذ(ة) وعدد النسخ ثم أرسل الطلب إلى الطابعة</small></span>
       <span class="fl"><svg><use href="#i-left"/></svg></span>
     </button>
+    <button class="carte c-listes" onclick="ouvrirClasses()">
+      <span class="ic or"><svg><use href="#i-list"/></svg></span>
+      <span class="tx"><b>طباعة قوائم التلاميذ</b><small>اختر قسمًا أو عدة أقسام ثم أرسل الطلب إلى الطابعة</small></span>
+      <span class="fl"><svg><use href="#i-left"/></svg></span>
+    </button>
     <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
     <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
   </div>
@@ -190,14 +216,42 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
       <button class="go" id="btnimp" onclick="imprimer()">طباعة</button>
     </div>
   </div>
+
+  <!-- Écran 4 : listes de classes -->
+  <div id="classes" class="screen">
+    <button class="retour" onclick="montrer('home')"><svg><use href="#i-back"/></svg> رجوع</button>
+    <div class="titreliste">طباعة قوائم التلاميذ</div>
+    <div class="msg" id="msgc"></div>
+    <div class="info" id="infoliste" style="display:none"></div>
+    <div class="barre">
+      <span><svg><use href="#i-users"/></svg><b id="nc">0</b> قسم · <b id="nt">0</b> تلميذ</span>
+      <button onclick="chargerClasses()"><svg><use href="#i-refresh"/></svg> تحديث القائمة</button>
+    </div>
+    <div class="outils">
+      <button class="petit" onclick="toutCocher(true)">تحديد الكل</button>
+      <button class="petit" onclick="toutCocher(false)">إلغاء التحديد</button>
+    </div>
+    <div id="listeclasses"></div>
+    <div class="actionbar">
+      <p class="lab" style="margin-top:0">عدد النسخ</p>
+      <div class="copies" id="copiesc" style="margin-bottom:12px">
+        <button class="on" onclick="nbc(1,this)">1</button>
+        <button onclick="nbc(2,this)">2</button>
+        <button onclick="nbc(3,this)">3</button>
+        <button onclick="nbc(4,this)">4</button>
+      </div>
+      <button class="go" id="btnc" onclick="imprimerClasses()" disabled>طباعة</button>
+    </div>
+  </div>
 </main>
 
-<footer>من تطوير الناظر دهان زكريا</footer>
+<footer>من تطوير الناظر د. زكرياء</footer>
 
 <script>
 /* Adresse du moteur Google Apps Script */
 var API = 'https://script.google.com/macros/s/AKfycbwdhQmakKqS_m9VC9SO3h7KwynRsCR9HnZu9Vl4e09tLdKRb7sZB_zQzzImGKJjVx88/exec';
 
+var CLASSES = [], SEL = {}, COPIES_C = 1;
 var CODE = '', SAISIE = '', ELEVES = [], PROFS = [], MODE = 'eleve', CHOIX = '', COPIES = 1, OCCUPE = false, DEFERRED = null;
 function $(id){ return document.getElementById(id); }
 
@@ -214,7 +268,7 @@ function appel(params){
 }
 
 function montrer(nom){
-  ['pin','home','ecole'].forEach(function(s){ $(s).classList.toggle('on', s === nom); });
+  ['pin','home','ecole','classes'].forEach(function(s){ $(s).classList.toggle('on', s === nom); });
   document.querySelector('main').scrollTop = 0;
 }
 
@@ -391,6 +445,161 @@ function imprimer(){
       b.disabled = false;
       $('msg').className = 'msg err';
       $('msg').textContent = 'تعذّر الاتصال، حاول مرة أخرى';
+    });
+}
+
+/* ---------- listes de classes ---------- */
+function messageClasses(texte){
+  var box = $('listeclasses'); box.innerHTML = '';
+  var v = document.createElement('div');
+  v.className = 'vide'; v.textContent = texte;
+  box.appendChild(v);
+}
+function ouvrirClasses(){
+  $('msgc').className = 'msg';
+  SEL = {};
+  montrer('classes');
+  chargerClasses();
+}
+function chargerClasses(){
+  $('nc').textContent = '0'; $('nt').textContent = '0';
+  messageClasses('...جارٍ التحميل');
+  appel({ action: 'liste_classes', code: CODE })
+    .then(function(r){
+      if(Object.prototype.toString.call(r) !== '[object Array]'){
+        $('infoliste').style.display = 'none';
+        if(r === 'aucun_fichier') messageClasses('لا يوجد ملف في مجلد ListesEleves بالدرايف');
+        else if(r === 'erreur_format') messageClasses('صيغة الملف غير مدعومة');
+        else messageClasses('تعذّر تحميل القوائم');
+        return;
+      }
+      CLASSES = r;
+      var garde = {};
+      for(var i = 0; i < r.length; i++){ if(SEL[r[i].c]) garde[r[i].c] = true; }
+      SEL = garde;
+      afficherClasses();
+      chargerInfo();
+    })
+    .catch(function(){ messageClasses('تعذّر الاتصال، حاول مرة أخرى'); });
+}
+function ligneTexte(parent, classe, texte){
+  var d = document.createElement('div');
+  if(classe) d.className = classe;
+  d.textContent = texte;
+  parent.appendChild(d);
+  return d;
+}
+function chargerInfo(){
+  appel({ action: 'info_listes', code: CODE })
+    .then(function(inf){ afficherInfo(inf); })
+    .catch(function(){ $('infoliste').style.display = 'none'; });
+}
+function afficherInfo(inf){
+  var box = $('infoliste');
+  box.innerHTML = '';
+  if(!inf || typeof inf !== 'object'){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  ligneTexte(box, 'i1', 'الملف المستعمل: ' + inf.f + ' — ' + inf.maj);
+  var r = inf.r;
+  if(!r) return;
+  var na = r.arrives.length, np = r.partis.length, nd = r.deplaces.length;
+  if(!na && !np && !nd){
+    ligneTexte(box, 'i2', 'آخر ملف (' + r.date + '): لا تغييرات');
+    return;
+  }
+  ligneTexte(box, 'i2', 'آخر تحديث (' + r.date + '): وصل ' + na + ' · غادر ' + np + ' · انتقل ' + nd);
+  var tg = document.createElement('button');
+  tg.type = 'button'; tg.className = 'tg'; tg.textContent = 'عرض التفاصيل';
+  var det = document.createElement('div');
+  det.className = 'det'; det.style.display = 'none';
+  var i;
+  for(i = 0; i < na; i++) ligneTexte(det, '', 'وصل: ' + r.arrives[i].n + ' — ' + r.arrives[i].c);
+  for(i = 0; i < np; i++) ligneTexte(det, '', 'غادر: ' + r.partis[i].n + ' — ' + r.partis[i].c);
+  for(i = 0; i < nd; i++) ligneTexte(det, '', 'انتقل: ' + r.deplaces[i].n + ' — من ' + r.deplaces[i].de + ' إلى ' + r.deplaces[i].vers);
+  tg.onclick = function(){
+    var ouvert = det.style.display !== 'none';
+    det.style.display = ouvert ? 'none' : 'block';
+    tg.textContent = ouvert ? 'عرض التفاصيل' : 'إخفاء التفاصيل';
+  };
+  box.appendChild(tg);
+  box.appendChild(det);
+}
+function nombreChoisies(){
+  var k = 0;
+  for(var i = 0; i < CLASSES.length; i++){ if(SEL[CLASSES[i].c]) k++; }
+  return k;
+}
+function majBarreClasses(){
+  var k = nombreChoisies(), total = 0;
+  for(var i = 0; i < CLASSES.length; i++) total += Number(CLASSES[i].n) || 0;
+  $('nc').textContent = CLASSES.length;
+  $('nt').textContent = total;
+  var b = $('btnc');
+  b.disabled = (k === 0);
+  b.textContent = k ? 'طباعة (' + k + ')' : 'طباعة';
+}
+function afficherClasses(){
+  var box = $('listeclasses'); box.innerHTML = '';
+  if(!CLASSES.length){ messageClasses('لا توجد أقسام في الجدول'); majBarreClasses(); return; }
+  for(var i = 0; i < CLASSES.length; i++){
+    var c = CLASSES[i];
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'rangee' + (SEL[c.c] ? ' on' : '');
+    var cs = document.createElement('span'); cs.className = 'case'; cs.innerHTML = '<svg><use href="#i-check"/></svg>';
+    var nm = document.createElement('span'); nm.className = 'nom'; nm.textContent = c.c;
+    var ef = document.createElement('span'); ef.className = 'eff'; ef.textContent = c.n + ' تلميذ';
+    b.appendChild(cs); b.appendChild(nm); b.appendChild(ef);
+    b.onclick = (function(nom, el){ return function(){
+      if(SEL[nom]) delete SEL[nom]; else SEL[nom] = true;
+      el.classList.toggle('on', !!SEL[nom]);
+      majBarreClasses();
+    }; })(c.c, b);
+    box.appendChild(b);
+  }
+  majBarreClasses();
+}
+function toutCocher(oui){
+  SEL = {};
+  if(oui){ for(var i = 0; i < CLASSES.length; i++) SEL[CLASSES[i].c] = true; }
+  afficherClasses();
+}
+function nbc(n, bouton){
+  COPIES_C = n;
+  var bs = bouton.parentNode.getElementsByTagName('button');
+  for(var i = 0; i < bs.length; i++) bs[i].classList.remove('on');
+  bouton.classList.add('on');
+}
+function imprimerClasses(){
+  var choisies = [];
+  for(var i = 0; i < CLASSES.length; i++){ if(SEL[CLASSES[i].c]) choisies.push(CLASSES[i].c); }
+  if(!choisies.length) return;
+  var b = $('btnc');
+  b.disabled = true;
+  $('msgc').className = 'msg ok';
+  $('msgc').textContent = '...جارٍ الإرسال';
+  appel({ action: 'imprimer_classes', code: CODE, classes: choisies.join('|'), copies: COPIES_C })
+    .then(function(r){
+      if(r === 'ok'){
+        $('msgc').className = 'msg ok';
+        $('msgc').textContent = 'تم الإرسال ✓ (' + choisies.length + ') ستبدأ الطباعة خلال دقيقة تقريبًا';
+        SEL = {};
+        afficherClasses();
+      } else if(r === 'partiel'){
+        $('msgc').className = 'msg err';
+        $('msgc').textContent = 'تم إرسال بعض القوائم فقط، تحقق من الجدول';
+        majBarreClasses();
+      } else {
+        $('msgc').className = 'msg err';
+        $('msgc').textContent = 'حدث خطأ، لم يتم الإرسال';
+        majBarreClasses();
+      }
+      document.querySelector('main').scrollTop = 0;
+    })
+    .catch(function(){
+      $('msgc').className = 'msg err';
+      $('msgc').textContent = 'تعذّر الاتصال، حاول مرة أخرى';
+      majBarreClasses();
     });
 }
 
