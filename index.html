@@ -101,6 +101,25 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .msg.ok{display:block;background:#143314;color:#9be59b}
 .msg.err{display:block;background:#4a1010;color:#ff9a9a}
 
+
+/* tableau récapitulatif des mouvements (accueil) */
+.recap{margin-top:6px}
+.rtitre{display:flex;align-items:center;justify-content:space-between;margin:0 4px 10px}
+.rtitre b{font-family:'Aref Ruqaa',serif;font-size:22px;color:#f6e7bf;font-weight:700}
+.rtitre button{background:none;border:0;color:var(--or);font-size:12px;display:inline-flex;align-items:center;gap:5px}
+.rgrille{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.rcol{border:1px solid #4a3a16;border-radius:18px;overflow:hidden;background:#14120d;min-width:0}
+.rcol h3{font-size:13px;font-weight:800;padding:10px 8px;text-align:center;line-height:1.4}
+.rcol.va h3{background:#10231c;color:#9be59b;border-bottom:1px solid #1f6b4f}
+.rcol.dp h3{background:#2a1313;color:#ff9a9a;border-bottom:1px solid #6b2a2a}
+.rcol h3 span{display:inline-block;margin-inline-start:6px;padding:0 8px;border-radius:10px;background:rgba(255,255,255,.12);font-size:12px}
+.mv{padding:9px 10px;border-bottom:1px solid #2a2518;font-size:12px;line-height:1.55;color:#bdb7a5}
+.mv:last-child{border-bottom:0}
+.mv b{display:block;font-size:13.5px;color:var(--txt);font-weight:800;overflow-wrap:anywhere}
+.mv .dt{color:var(--or);font-weight:700}
+.rvide{padding:14px 8px;text-align:center;font-size:12px;color:#8d8777}
+.rmsg{text-align:center;font-size:12px;color:#bdb7a5;padding:10px}
+
 /* PC et tablette : liste sur deux colonnes */
 @media (min-width:900px){
   #classes{max-width:860px}
@@ -184,6 +203,14 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
       <span class="tx"><b>طباعة قوائم التلاميذ</b><small>اختر قسمًا أو عدة أقسام ثم أرسل الطلب إلى الطابعة</small></span>
       <span class="fl"><svg><use href="#i-left"/></svg></span>
     </button>
+    <div class="recap" id="recap" style="display:none">
+      <div class="rtitre"><b>حركة التلاميذ</b><button type="button" onclick="chargerMouvements()"><svg><use href="#i-refresh"/></svg> تحديث</button></div>
+      <div class="rmsg" id="rmsg"></div>
+      <div class="rgrille" id="rgrille" style="display:none">
+        <div class="rcol va"><h3><span id="nA">0</span><em id="titreA" style="font-style:normal"></em></h3><div id="mvA"></div></div>
+        <div class="rcol dp"><h3><span id="nP">0</span>المغادرون</h3><div id="mvP"></div></div>
+      </div>
+    </div>
     <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
     <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
   </div>
@@ -311,6 +338,7 @@ function verifier(){
       if(!liste){ $('pinmsg').textContent = 'الرمز غير صحيح، أو التطبيق مقفل مؤقتًا'; return; }
       CODE = c; ELEVES = liste; $('pinmsg').textContent = '';
       montrer('home');
+      chargerMouvements();
     })
     .catch(function(){
       OCCUPE = false; SAISIE = ''; majCases();
@@ -601,6 +629,44 @@ function imprimerClasses(){
       $('msgc').textContent = 'تعذّر الاتصال، حاول مرة أخرى';
       majBarreClasses();
     });
+}
+
+
+/* ---------- tableau des mouvements (وافدون / مغادرون) ---------- */
+function chargerMouvements(){
+  $('recap').style.display = 'block';
+  $('rgrille').style.display = 'none';
+  $('rmsg').style.display = 'block';
+  $('rmsg').textContent = '...جارٍ التحميل';
+  appel({ action: 'mouvements', code: CODE })
+    .then(function(r){ afficherMouvements(r); })
+    .catch(function(){ $('rmsg').textContent = 'تعذّر الاتصال، اضغط تحديث'; });
+}
+function remplirMouvements(box, liste, vide, libelleDate){
+  box.innerHTML = '';
+  if(!liste.length){ ligneTexte(box, 'rvide', vide); return; }
+  for(var i = 0; i < liste.length; i++){
+    var x = liste[i];
+    var d = document.createElement('div'); d.className = 'mv';
+    var b = document.createElement('b'); b.textContent = x.n; d.appendChild(b);
+    ligneTexte(d, '', 'السنة: ' + (x.v || '—') + ' · رقم القيد: ' + (x.r || '—'));
+    ligneTexte(d, 'dt', libelleDate + ': ' + (x.d || '—'));
+    box.appendChild(d);
+  }
+}
+function afficherMouvements(r){
+  if(!r || typeof r !== 'object'){
+    $('rmsg').style.display = 'block';
+    $('rmsg').textContent = (r === 'aucun_fichier') ? 'لا يوجد ملف في مجلد ListesEleves' : 'تعذّر تحميل الحركة';
+    return;
+  }
+  $('rmsg').style.display = 'none';
+  $('rgrille').style.display = 'grid';
+  $('titreA').textContent = 'التلاميذ الوافدون في شهر ' + r.mois;
+  $('nA').textContent = r.a.length;
+  $('nP').textContent = r.p.length;
+  remplirMouvements($('mvA'), r.a, 'لا أحد', 'تاريخ الوفود');
+  remplirMouvements($('mvP'), r.p, 'لا أحد', 'تاريخ المغادرة');
 }
 
 /* ---------- installation de l'application ---------- */
