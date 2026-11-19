@@ -96,6 +96,10 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .copies button{flex:1;height:58px;border-radius:16px;border:1.5px solid var(--bord);background:#1c1b17;font-size:22px;font-weight:800}
 .copies button.on{background:var(--vert);border-color:var(--vert);color:#fff}
 .go{width:100%;height:58px;border-radius:18px;border:0;background:var(--vert);color:#fff;font-size:20px;font-weight:800}
+.deuxgo{display:flex;gap:10px}
+.deuxgo .go{flex:1;height:auto;min-height:58px;padding:8px 6px;font-size:15px;line-height:1.35}
+.deuxgo .go.cach{background:#2b3fa8}
+.deuxgo .go:disabled{opacity:.5}
 .go:disabled{opacity:.5}
 .msg{display:none;margin-bottom:14px;padding:12px;border-radius:14px;text-align:center;font-size:14px;font-weight:700}
 .msg.ok{display:block;background:#143314;color:#9be59b}
@@ -267,7 +271,10 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
         <button onclick="nbc(3,this)">3</button>
         <button onclick="nbc(4,this)">4</button>
       </div>
-      <button class="go" id="btnc" onclick="imprimerClasses()" disabled>طباعة</button>
+      <div class="deuxgo">
+        <button class="go" id="btnc" onclick="imprimerClasses(false)" disabled>طباعة بدون ختم</button>
+        <button class="go cach" id="btnc2" onclick="imprimerClasses(true)" disabled>طباعة مع إضافة ختم الناظر</button>
+      </div>
     </div>
   </div>
 </main>
@@ -562,9 +569,11 @@ function majBarreClasses(){
   for(var i = 0; i < CLASSES.length; i++) total += Number(CLASSES[i].n) || 0;
   $('nc').textContent = CLASSES.length;
   $('nt').textContent = total;
-  var b = $('btnc');
-  b.disabled = (k === 0);
-  b.textContent = k ? 'طباعة (' + k + ')' : 'طباعة';
+  var n = k ? ' (' + k + ')' : '';
+  $('btnc').disabled = (k === 0);
+  $('btnc2').disabled = (k === 0);
+  $('btnc').textContent = 'طباعة بدون ختم' + n;
+  $('btnc2').textContent = 'طباعة مع إضافة ختم الناظر' + n;
 }
 function afficherClasses(){
   var box = $('listeclasses'); box.innerHTML = '';
@@ -598,15 +607,15 @@ function nbc(n, bouton){
   for(var i = 0; i < bs.length; i++) bs[i].classList.remove('on');
   bouton.classList.add('on');
 }
-function imprimerClasses(){
+function imprimerClasses(avecCachet){
   var choisies = [];
   for(var i = 0; i < CLASSES.length; i++){ if(SEL[CLASSES[i].c]) choisies.push(CLASSES[i].c); }
   if(!choisies.length) return;
-  var b = $('btnc');
-  b.disabled = true;
+  $('btnc').disabled = true;
+  $('btnc2').disabled = true;
   $('msgc').className = 'msg ok';
   $('msgc').textContent = '...جارٍ الإرسال';
-  appel({ action: 'imprimer_classes', code: CODE, classes: choisies.join('|'), copies: COPIES_C })
+  appel({ action: 'imprimer_classes', code: CODE, classes: choisies.join('|'), copies: COPIES_C, cachet: avecCachet ? 1 : 0 })
     .then(function(r){
       if(r === 'ok'){
         $('msgc').className = 'msg ok';
