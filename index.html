@@ -659,6 +659,7 @@ function remplirMouvements(box, liste, vide, libelleDate){
     var d = document.createElement('div'); d.className = 'mv';
     var b = document.createElement('b'); b.textContent = x.n; d.appendChild(b);
     ligneTexte(d, '', 'السنة: ' + (x.v || '—') + ' · رقم القيد: ' + (x.r || '—'));
+    ligneTexte(d, '', 'تاريخ الازدياد: ' + (x.b ? String(x.b).replace(/-/g, '/') : '—'));
     ligneTexte(d, 'dt', libelleDate + ': ' + (x.d || '—'));
     box.appendChild(d);
   }
