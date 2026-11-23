@@ -698,28 +698,45 @@ if('serviceWorker' in navigator){
 
 /* ---------- الإشعارات (OneSignal) ---------- */
 var BASE = location.pathname.replace(/[^\/]*$/, '');
+var NOTIF_PRET = false;
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(function(OneSignal){
   OneSignal.init({
     appId: '30f05208-9f7c-4996-b439-3e55c97c7b4b',
     serviceWorkerPath: BASE + 'sw.js',
     serviceWorkerParam: { scope: BASE },
-    notifyButton: { enable: false },
-    promptOptions: { autoPrompt: false }
+    notifyButton: { enable: false }
   }).then(function(){
+    NOTIF_PRET = true;
     majBoutonNotif(OneSignal);
     OneSignal.User.PushSubscription.addEventListener('change', function(){ majBoutonNotif(OneSignal); });
-  }).catch(function(){});
+  }).catch(function(e){
+    montrerErreurNotif('تعذر التهيئة: ' + (e && e.message ? e.message : e));
+  });
 });
+function montrerErreurNotif(t){
+  var b = $('notif');
+  if(!b) return;
+  b.style.display = 'block';
+  b.textContent = '⚠️ ' + String(t).slice(0, 120);
+}
 function majBoutonNotif(OneSignal){
   var b = $('notif');
   if(!b) return;
   var actif = OneSignal.User.PushSubscription.optedIn;
+  b.textContent = '🔔 تفعيل الإشعارات';
   b.style.display = actif ? 'none' : 'block';
 }
+/* si OneSignal ne répond pas au bout de 6 secondes, on l'indique au lieu de rester muet */
+setTimeout(function(){
+  if(!NOTIF_PRET) montrerErreurNotif(typeof OneSignal === 'undefined' ? 'لم يتم تحميل خدمة الإشعارات' : 'خدمة الإشعارات لا تستجيب');
+}, 6000);
 function activerNotif(){
-  window.OneSignalDeferred.push(function(OneSignal){
-    OneSignal.User.PushSubscription.optIn().then(function(){ majBoutonNotif(OneSignal); }).catch(function(){});
+  if(typeof OneSignal === 'undefined'){ montrerErreurNotif('لم يتم تحميل خدمة الإشعارات'); return; }
+  OneSignalDeferred.push(function(OneSignal){
+    OneSignal.User.PushSubscription.optIn()
+      .then(function(){ majBoutonNotif(OneSignal); })
+      .catch(function(e){ montrerErreurNotif('تعذر التفعيل: ' + (e && e.message ? e.message : e)); });
   });
 }
 
