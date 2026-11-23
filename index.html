@@ -220,6 +220,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
     <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
     <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
     <button class="notif" id="notif" onclick="activerNotif()">🔔 تفعيل الإشعارات</button>
+    <p class="note" id="notifdiag" style="direction:ltr;font-size:12px;word-break:break-all"></p>
   </div>
 
   <!-- Écran 3 : certificats scolaires -->
@@ -718,11 +719,28 @@ OneSignalDeferred.push(function(OneSignal){
   }).then(function(){
     NOTIF_PRET = true;
     majBoutonNotif(OneSignal);
-    OneSignal.User.PushSubscription.addEventListener('change', function(){ majBoutonNotif(OneSignal); });
+    diagNotif(OneSignal, 'init=ok');
+    OneSignal.User.PushSubscription.addEventListener('change', function(){ majBoutonNotif(OneSignal); diagNotif(OneSignal, 'change'); });
   }).catch(function(e){
     montrerErreurNotif('تعذر التهيئة: ' + (e && e.message ? e.message : e));
   });
 });
+function diagNotif(OneSignal, extra){
+  var d = $('notifdiag');
+  if(!d) return;
+  var perm = (typeof Notification !== 'undefined') ? Notification.permission : 'non supporte';
+  var p = null, opt = '?', id = '-';
+  try{ p = OneSignal.User.PushSubscription; opt = p.optedIn; id = p.id || '-'; }catch(e){}
+  var sw = '';
+  if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+    navigator.serviceWorker.getRegistrations().then(function(r){
+      sw = r.map(function(x){ return x.scope; }).join(' ; ') || 'aucun';
+      d.textContent = 'permission=' + perm + ' | optedIn=' + opt + ' | id=' + id + ' | SW=' + sw + (extra ? ' | ' + extra : '');
+    });
+  } else {
+    d.textContent = 'permission=' + perm + ' | optedIn=' + opt + ' | id=' + id + (extra ? ' | ' + extra : '');
+  }
+}
 function montrerErreurNotif(t){
   var b = $('notif');
   if(!b) return;
@@ -744,8 +762,8 @@ function activerNotif(){
   if(typeof OneSignal === 'undefined'){ montrerErreurNotif('لم يتم تحميل خدمة الإشعارات'); return; }
   OneSignalDeferred.push(function(OneSignal){
     OneSignal.User.PushSubscription.optIn()
-      .then(function(){ majBoutonNotif(OneSignal); })
-      .catch(function(e){ montrerErreurNotif('تعذر التفعيل: ' + (e && e.message ? e.message : e)); });
+      .then(function(){ majBoutonNotif(OneSignal); setTimeout(function(){ diagNotif(OneSignal, 'apres clic'); }, 2500); })
+      .catch(function(e){ montrerErreurNotif('تعذر التفعيل: ' + (e && e.message ? e.message : e)); diagNotif(OneSignal, 'erreur clic: ' + (e && e.message ? e.message : e)); });
   });
 }
 
