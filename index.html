@@ -72,7 +72,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .actionbar{position:sticky;bottom:-16px;margin:14px -16px -16px;padding:12px 16px 16px;background:#15130e;border-top:1px solid #4a3a16}
 .titreliste{font-family:'Aref Ruqaa',serif;font-size:24px;color:#f6e7bf;margin:0 4px 12px}
 .note{text-align:center;font-size:12px;margin-top:20px;font-style:italic}
-.notif{display:none;width:100%;margin-top:12px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:var(--or);color:#2c1e06;font-size:17px;font-weight:800}
+.notif{display:none;width:100%;margin-top:12px;min-height:50px;padding:8px 10px;line-height:1.4;border-radius:16px;border:1.5px solid var(--or);background:var(--or);color:#2c1e06;font-size:17px;font-weight:800}
 .inst{display:none;width:100%;margin-top:18px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:transparent;color:var(--or);font-size:17px;font-weight:800}
 
 /* liste des élèves */
@@ -699,11 +699,20 @@ if('serviceWorker' in navigator){
 /* ---------- الإشعارات (OneSignal) ---------- */
 var BASE = location.pathname.replace(/[^\/]*$/, '');
 var NOTIF_PRET = false;
+var NOTIF_ERR = '';
+(function(){
+  function noter(t){ t = String(t); if(/onesignal|push|service|worker|scope|origin|url/i.test(t)) NOTIF_ERR = t.slice(0, 140); }
+  var e0 = console.error, w0 = console.warn;
+  console.error = function(){ try{ noter(Array.prototype.join.call(arguments, ' ')); }catch(x){} return e0.apply(console, arguments); };
+  console.warn  = function(){ try{ noter(Array.prototype.join.call(arguments, ' ')); }catch(x){} return w0.apply(console, arguments); };
+  window.addEventListener('error', function(ev){ noter(ev.message); });
+  window.addEventListener('unhandledrejection', function(ev){ noter(ev.reason && ev.reason.message ? ev.reason.message : ev.reason); });
+})();
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(function(OneSignal){
   OneSignal.init({
     appId: '30f05208-9f7c-4996-b439-3e55c97c7b4b',
-    serviceWorkerPath: BASE + 'sw.js',
+    serviceWorkerPath: BASE.replace(/^\//, '') + 'sw.js',
     serviceWorkerParam: { scope: BASE },
     notifyButton: { enable: false }
   }).then(function(){
@@ -718,7 +727,7 @@ function montrerErreurNotif(t){
   var b = $('notif');
   if(!b) return;
   b.style.display = 'block';
-  b.textContent = '⚠️ ' + String(t).slice(0, 120);
+  b.textContent = '⚠️ ' + String(t).slice(0, 220);
 }
 function majBoutonNotif(OneSignal){
   var b = $('notif');
@@ -729,7 +738,7 @@ function majBoutonNotif(OneSignal){
 }
 /* si OneSignal ne répond pas au bout de 6 secondes, on l'indique au lieu de rester muet */
 setTimeout(function(){
-  if(!NOTIF_PRET) montrerErreurNotif(typeof OneSignal === 'undefined' ? 'لم يتم تحميل خدمة الإشعارات' : 'خدمة الإشعارات لا تستجيب');
+  if(!NOTIF_PRET) montrerErreurNotif((typeof OneSignal === 'undefined' ? 'لم يتم تحميل خدمة الإشعارات' : 'خدمة الإشعارات لا تستجيب') + (NOTIF_ERR ? ' | ' + NOTIF_ERR : ''));
 }, 6000);
 function activerNotif(){
   if(typeof OneSignal === 'undefined'){ montrerErreurNotif('لم يتم تحميل خدمة الإشعارات'); return; }
