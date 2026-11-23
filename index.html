@@ -72,6 +72,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
 .actionbar{position:sticky;bottom:-16px;margin:14px -16px -16px;padding:12px 16px 16px;background:#15130e;border-top:1px solid #4a3a16}
 .titreliste{font-family:'Aref Ruqaa',serif;font-size:24px;color:#f6e7bf;margin:0 4px 12px}
 .note{text-align:center;font-size:12px;margin-top:20px;font-style:italic}
+.notif{display:none;width:100%;margin-top:12px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:var(--or);color:#2c1e06;font-size:17px;font-weight:800}
 .inst{display:none;width:100%;margin-top:18px;height:50px;border-radius:16px;border:1.5px solid var(--or);background:transparent;color:var(--or);font-size:17px;font-weight:800}
 
 /* liste des élèves */
@@ -152,6 +153,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
   footer{padding:8px}
 }
 </style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 </head>
 <body>
 
@@ -217,6 +219,7 @@ h2{font-family:'Aref Ruqaa',serif;font-size:28px;text-align:center}
     </div>
     <p class="note">تُطبع الشهادات مباشرة في المدرسة بعد إرسال الطلب</p>
     <button class="inst" id="install" onclick="installer()">تثبيت التطبيق</button>
+    <button class="notif" id="notif" onclick="activerNotif()">🔔 تفعيل الإشعارات</button>
   </div>
 
   <!-- Écran 3 : certificats scolaires -->
@@ -691,6 +694,33 @@ function installer(){
 }
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+
+/* ---------- الإشعارات (OneSignal) ---------- */
+var BASE = location.pathname.replace(/[^\/]*$/, '');
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(function(OneSignal){
+  OneSignal.init({
+    appId: '30f05208-9f7c-4996-b439-3e55c97c7b4b',
+    serviceWorkerPath: BASE + 'sw.js',
+    serviceWorkerParam: { scope: BASE },
+    notifyButton: { enable: false },
+    promptOptions: { autoPrompt: false }
+  }).then(function(){
+    majBoutonNotif(OneSignal);
+    OneSignal.User.PushSubscription.addEventListener('change', function(){ majBoutonNotif(OneSignal); });
+  }).catch(function(){});
+});
+function majBoutonNotif(OneSignal){
+  var b = $('notif');
+  if(!b) return;
+  var actif = OneSignal.User.PushSubscription.optedIn;
+  b.style.display = actif ? 'none' : 'block';
+}
+function activerNotif(){
+  window.OneSignalDeferred.push(function(OneSignal){
+    OneSignal.User.PushSubscription.optIn().then(function(){ majBoutonNotif(OneSignal); }).catch(function(){});
+  });
 }
 
 construireClavier();
