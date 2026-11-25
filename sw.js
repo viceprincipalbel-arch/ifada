@@ -1,6 +1,4 @@
-importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
-
-var CACHE = 'ifada-v2';
+var CACHE = 'ifada-v1';
 var FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function(e){
